@@ -1,10 +1,12 @@
 import './App.scss';
-import ChatGPTComponent from './components/chatGPTComponent/chatGPTComponent';
+import OpenModalChatboxComponent from './components/open-modal-chat/open-modal-chat';
+import './components/open-modal-chat/open-modal-chat.tsx'
 
 function App() {
   return (
     <div className="App">
-      <ChatGPTComponent></ChatGPTComponent>
+      Hi there
+      <OpenModalChatboxComponent></OpenModalChatboxComponent>
     </div>
   );
 }

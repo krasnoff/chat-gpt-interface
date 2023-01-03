@@ -1,0 +1,12 @@
+.positionBottomRight {
+    position: absolute;
+    bottom: 1.0rem;
+    right: 1.0rem;
+}
+
+.iconLarge {
+    &::before {
+        font-size: 3.0rem;
+        font-weight: 700;
+    }
+}
