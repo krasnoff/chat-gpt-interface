@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import styles from './open-modal-chat.module.scss';
 import Modal from 'react-bootstrap/Modal';
 import { Button } from 'react-bootstrap';
@@ -18,26 +18,20 @@ function OpenModalChatboxComponent() {
             console.log('on end: ', value);
         }
     });
-    const { speak } = useSpeechSynthesis();
+    const { speak, voices, setSelectedVoice } = useSpeechSynthesis();
     
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
 
-    const endHandler = (evt: SpeechSynthesisEvent) => {
-        console.log('endHandler', evt)
-    }
+    useEffect(() => {
+        if (voices && voices.length > 0) {
+          setSelectedVoice(voices[5])
+        }
+    }, [voices, setSelectedVoice]);
 
     const speakHandler = () => {
-        const voiceArray: Array<SpeechSynthesisVoice> = window.speechSynthesis.getVoices();
-        // console.log(window.speechSynthesis.getVoices());
-        
         const speakArgs: SpeakArguments = {
-            text: "I am a robot",
-            voice: voiceArray[5],
-            onend: endHandler,
-            rate: 1,
-            pitch: 1,
-            volume: 10
+            text: "I am a robot"
         }
 
         speak(speakArgs);
