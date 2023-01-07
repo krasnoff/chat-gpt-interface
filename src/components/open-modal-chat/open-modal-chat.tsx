@@ -2,20 +2,22 @@ import { useEffect, useState } from 'react';
 import styles from './open-modal-chat.module.scss';
 import Modal from 'react-bootstrap/Modal';
 import { Button } from 'react-bootstrap';
-import { useSpeechRecognition } from 'react-speech-kit';
 import useSpeechSynthesis  from './hooks/useSpeechSynthesis';
 import { SpeakArguments } from './interfaces/SpeakArguments';
+import useSpeechRecognition from './hooks/useSpeechRecognition';
 
 
 function OpenModalChatboxComponent() {
     const [show, setShow] = useState(false);
     const [value, setValue] = useState('');
+    // const [endFlag, setEndFlag] = useState(false);
     const { listen, listening, stop } = useSpeechRecognition({
         onResult: (result: any) => {
           setValue(result);
         },
         onEnd: () => {
             console.log('on end: ', value);
+            // setEndFlag(true)
         }
     });
     const { speak, voices, setSelectedVoice } = useSpeechSynthesis();
