@@ -52,6 +52,7 @@ const useSpeechSynthesis = () => {
     utterance.onpause = args.onpause ? args.onpause : null;
     utterance.onresume = args.onresume ? args.onresume : null;
     utterance.onstart = args.onstart ? args.onstart : null;
+    window.speechSynthesis.cancel();
     window.speechSynthesis.speak(utterance);
   };
 
