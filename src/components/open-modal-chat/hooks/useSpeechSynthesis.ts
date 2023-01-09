@@ -37,6 +37,7 @@ const useSpeechSynthesis = () => {
   const speak = (args: SpeakArguments) => {
     if (!supported) return;
     setSpeaking(true);
+    // window.speechSynthesis.cancel();
     // Firefox won't repeat an utterance that has been
     // spoken, so we need to create a new instance each time
     const utterance = new window.SpeechSynthesisUtterance();
