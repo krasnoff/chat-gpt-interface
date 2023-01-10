@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import styles from './open-modal-chat.module.scss';
-import Modal from 'react-bootstrap/Modal';
+// import Modal from 'react-bootstrap/Modal';
 import { Button } from 'react-bootstrap';
+import Spinner from 'react-bootstrap/Spinner';
 import useSpeechSynthesis  from './hooks/useSpeechSynthesis';
 import { SpeakArguments } from './interfaces/SpeakArguments';
 import useSpeechRecognition from './hooks/useSpeechRecognition';
@@ -9,17 +10,19 @@ import { ChatGPTResultObj } from './interfaces/chatGPTResultObj';
 
 
 function OpenModalChatboxComponent() {
-    const [show, setShow] = useState(false);
+    // const [show, setShow] = useState(false);
     const [value, setValue] = useState('');
-    // const [endFlag, setEndFlag] = useState(false);
+    const [isListening, setIsListening] = useState<boolean>(false);
+    
     const { listen, listening, stop } = useSpeechRecognition({
         onResult: (result: any) => {
-          setValue(result);
+            setValue(result);
         },
         onEnd: async () => {
             const res = await fetchData(value);
             const res2 = parseAnswer(res);
             speakHandler(res2);
+            setIsListening(false);
         }
     });
     const { speak, voices, setSelectedVoice } = useSpeechSynthesis();
@@ -55,10 +58,11 @@ function OpenModalChatboxComponent() {
         return result;
     }
     
-    const handleClose = () => setShow(false);
-    const handleShow = () => setShow(true);
+    // const handleClose = () => setShow(false);
+    // const handleShow = () => setShow(true);
 
     const initiateStop = () => {
+        setIsListening(true);
         setTimeout(() => {
             stop();
         }, 1000)
@@ -80,26 +84,40 @@ function OpenModalChatboxComponent() {
 
     return (
         <>
-            <button 
+            {/* <button 
                 className={['btn btn-danger', styles.positionBottomRight, 'btn-circle btn-xl'].join(' ')}
                 onClick={() => handleShow()}
                 title="Open Chatbox"
                 aria-label='Open Chatbox'
             >
                 <i className={['bi bi-chat-dots', styles.iconLarge].join(' ')}></i>
-            </button>
+            </button> */}
 
-            <Modal show={show} onHide={handleClose}>
+            <div className={styles.buttonSection}>
+                <div className={styles.innerDiv}>
+                    <Button variant="danger"  onMouseDown={listen} onMouseUp={initiateStop} className={['btn btn-danger', 'btn-circle btn-xl'].join(' ')} disabled={isListening}>
+                        {!isListening ? <i className={['bi bi-mic-fill', styles.iconLarge].join(' ')}></i> : null}
+                        {isListening ? 
+                            <Spinner
+                                as="span"
+                                animation="border"
+                                role="status"
+                                aria-hidden="true"
+                            />
+                        : null}
+                    </Button>
+                    {listening && <div>Go ahead I'm listening</div>}
+                </div>
+            </div>
+
+            {/* <Modal show={show} onHide={handleClose}>
                 <Modal.Header closeButton>
                 <Modal.Title>Modal heading</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <div className='d-flex'>
                         <div>
-                            <Button variant="danger" onMouseDown={listen} onMouseUp={initiateStop} className={['btn btn-danger', 'btn-circle btn-xl'].join(' ')}>
-                                <i className={['bi bi-mic-fill', styles.iconLarge].join(' ')}></i>
-                            </Button>
-                            {listening && <div>Go ahead I'm listening</div>}
+                            
                         </div>
                         <div>
                             <Button variant="Success" onClick={() => speakHandler('I am a robot')} className={['btn btn-success', 'btn-circle btn-xl'].join(' ')}>
@@ -109,7 +127,7 @@ function OpenModalChatboxComponent() {
                     </div>
                 </Modal.Body>
                 
-            </Modal>
+            </Modal> */}
         </>
     );
 }

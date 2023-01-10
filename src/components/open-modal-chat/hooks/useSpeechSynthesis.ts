@@ -41,7 +41,7 @@ const useSpeechSynthesis = () => {
     // Firefox won't repeat an utterance that has been
     // spoken, so we need to create a new instance each time
     const utterance = new window.SpeechSynthesisUtterance();
-    utterance.text = args.text;
+    utterance.text = 'my name is kobi';//args.text;
     utterance.voice = args.voice ? args.voice : selectedVoice;
     utterance.onend = args.onend ? args.onend : null;
     utterance.rate = args.rate ? args.rate : 1;
@@ -53,7 +53,7 @@ const useSpeechSynthesis = () => {
     utterance.onpause = args.onpause ? args.onpause : null;
     utterance.onresume = args.onresume ? args.onresume : null;
     utterance.onstart = args.onstart ? args.onstart : null;
-    window.speechSynthesis.cancel();
+    // window.speechSynthesis.cancel();
     window.speechSynthesis.speak(utterance);
   };
 

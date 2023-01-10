@@ -10,3 +10,15 @@
         font-weight: 700;
     }
 }
+
+.buttonSection {
+    display: flex;
+    justify-content: center;
+
+    .innerDiv {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+}
