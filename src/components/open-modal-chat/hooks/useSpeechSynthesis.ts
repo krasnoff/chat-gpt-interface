@@ -29,11 +29,11 @@ const useSpeechSynthesis = () => {
     }
   }, [getVoices]);
 
-  useEffect(() => {
-    if (voices && voices.length > 0) {
-      setSelectedVoice(voices[0])
-    }
-  }, [voices]);
+  // useEffect(() => {
+  //   if (voices && voices.length > 0) {
+  //     setSelectedVoice(voices[0])
+  //   }
+  // }, [voices]);
 
   const speak = (args: SpeakArguments) => {
     if (!supported) return;
