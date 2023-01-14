@@ -1,18 +1,30 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import styles from './open-modal-chat.module.scss';
-// import Modal from 'react-bootstrap/Modal';
-import { Button } from 'react-bootstrap';
 import Spinner from 'react-bootstrap/Spinner';
 import useSpeechSynthesis  from './hooks/useSpeechSynthesis';
 import { SpeakArguments } from './interfaces/SpeakArguments';
 import useSpeechRecognition from './hooks/useSpeechRecognition';
 import { ChatGPTResultObj } from './interfaces/chatGPTResultObj';
+import { Button, Form, Modal } from 'react-bootstrap';
+import { SubmitHandler, useForm } from 'react-hook-form';
 
+interface ISpeechSynthesisConf {
+    voice: SpeechSynthesisVoice;
+    rate: number;
+    pitch: number;
+    volume: number;
+}
 
 function OpenModalChatboxComponent() {
-    // const [show, setShow] = useState(false);
+    const [show, setShow] = useState(false);
     const [value, setValue] = useState('');
     const [isListening, setIsListening] = useState<boolean>(false);
+
+    const { register, handleSubmit, watch } = useForm<ISpeechSynthesisConf>();
+    const onSubmit: SubmitHandler<ISpeechSynthesisConf> = data => {
+        console.log(data);
+        handleClose();
+    };
     
     const { listen, listening, stop } = useSpeechRecognition({
         onResult: (result: any) => {
@@ -25,7 +37,7 @@ function OpenModalChatboxComponent() {
             setIsListening(false);
         }
     });
-    const { speak, voices, setSelectedVoice } = useSpeechSynthesis();
+    const { speak } = useSpeechSynthesis();
 
     const fetchData = async (searchString: Object) => {
         try {
@@ -35,7 +47,6 @@ function OpenModalChatboxComponent() {
                 body: JSON.stringify(searchString)
             });
             const json = await res.json();
-            // console.log('json: ', json);
             return json;
         } catch (error) {
             console.log('error: ', error);
@@ -43,7 +54,6 @@ function OpenModalChatboxComponent() {
     };
 
     const parseAnswer = (res: ChatGPTResultObj) => {
-        //console.log('parseAnswer', res);
         let result: string = '';
         
         if (res && res.choices) {
@@ -58,8 +68,8 @@ function OpenModalChatboxComponent() {
         return result;
     }
     
-    // const handleClose = () => setShow(false);
-    // const handleShow = () => setShow(true);
+    const handleClose = () => setShow(false);
+    const handleShow = () => setShow(true);
 
     const initiateStop = () => {
         setIsListening(true);
@@ -68,11 +78,15 @@ function OpenModalChatboxComponent() {
         }, 1000)
     }
 
-    useEffect(() => {
-        if (voices && voices.length > 0) {
-          setSelectedVoice(voices[5])
-        }
-    }, [voices, setSelectedVoice]);
+    // useEffect(() => {
+    //     if (voices && voices.length > 0) {
+    //       setSelectedVoice(voices[5])
+    //     }
+    // }, [voices, setSelectedVoice]);
+
+    // TODO
+    // initial default values if you dont have any values in localhost
+    // apply these setting to speech synthesis
 
     const speakHandler = (str: string) => {
         const speakArgs: SpeakArguments = {
@@ -84,15 +98,6 @@ function OpenModalChatboxComponent() {
 
     return (
         <>
-            {/* <button 
-                className={['btn btn-danger', styles.positionBottomRight, 'btn-circle btn-xl'].join(' ')}
-                onClick={() => handleShow()}
-                title="Open Chatbox"
-                aria-label='Open Chatbox'
-            >
-                <i className={['bi bi-chat-dots', styles.iconLarge].join(' ')}></i>
-            </button> */}
-
             <div className={styles.buttonSection}>
                 <div className={styles.innerDiv}>
                     <Button variant="danger"  onMouseDown={listen} onMouseUp={initiateStop} className={['btn btn-danger', 'btn-circle btn-xl'].join(' ')} disabled={isListening}>
@@ -107,27 +112,48 @@ function OpenModalChatboxComponent() {
                         : null}
                     </Button>
                     {listening && <div>Go ahead I'm listening</div>}
+                    <div 
+                        className={styles.configuration} 
+                        title="Configuration" 
+                        onClick={() => handleShow()}>
+                            <i className="bi bi-gear-fill"></i>
+                    </div>
                 </div>
             </div>
 
-            {/* <Modal show={show} onHide={handleClose}>
+            <Modal show={show} onHide={handleClose}>
+                <form onSubmit={handleSubmit(onSubmit)}>
                 <Modal.Header closeButton>
-                <Modal.Title>Modal heading</Modal.Title>
+                <Modal.Title>Configuration</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <div className='d-flex'>
-                        <div>
-                            
-                        </div>
-                        <div>
-                            <Button variant="Success" onClick={() => speakHandler('I am a robot')} className={['btn btn-success', 'btn-circle btn-xl'].join(' ')}>
-                                <i className={['bi bi-volume-up-fill', styles.iconLarge].join(' ')}></i>
-                            </Button>
-                        </div>
+                    <div className="mb-3">
+                        <label htmlFor="voice" className="form-label">Choose voice</label>
+                        <Form.Select aria-label="Default select example" {...register("voice")}>
+                            {window.speechSynthesis.getVoices().map((el, index) => 
+                                <option value={index} key={index}>{el.name}</option>
+                            )}
+                        </Form.Select>
+                    </div>
+                    <div className="mb-3">
+                        <label htmlFor="rate" className="form-label">Rate</label> ({ watch('rate') })
+                        <input type="range" className="form-range" min="0.5" max="2" step="0.1" {...register("rate")} />
+                    </div>
+                    <div className="mb-3">
+                        <label htmlFor="pitch" className="form-label">Pitch</label> ({ watch('pitch') })
+                        <input type="range" className="form-range" min="0" max="2" step="0.1" {...register("pitch")} />
+                    </div>
+                    <div className="mb-3">
+                        <label htmlFor="volume" className="form-label">Volume</label> ({ watch('volume') })
+                        <input type="range" className="form-range" min="0" max="1" step="0.1" {...register("volume")} />
                     </div>
                 </Modal.Body>
-                
-            </Modal> */}
+                <Modal.Footer>
+                    <Button variant="outline-secondary" onClick={() => handleClose()}>Cancel</Button>
+                    <Button variant="primary" type="submit">Submit</Button>
+                </Modal.Footer>
+                </form>
+            </Modal>
         </>
     );
 }
