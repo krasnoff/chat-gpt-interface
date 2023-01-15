@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import styles from './open-modal-chat.module.scss';
 import Spinner from 'react-bootstrap/Spinner';
 import useSpeechSynthesis  from './hooks/useSpeechSynthesis';
@@ -9,7 +9,7 @@ import { Button, Form, Modal } from 'react-bootstrap';
 import { SubmitHandler, useForm } from 'react-hook-form';
 
 interface ISpeechSynthesisConf {
-    voice: SpeechSynthesisVoice;
+    voice?: SpeechSynthesisVoice;
     rate: number;
     pitch: number;
     volume: number;
@@ -19,6 +19,7 @@ function OpenModalChatboxComponent() {
     const [show, setShow] = useState(false);
     const [value, setValue] = useState('');
     const [isListening, setIsListening] = useState<boolean>(false);
+    const [currentSpeechSynthesis, setCurrentSpeechSynthesis] = useState<ISpeechSynthesisConf>()
 
     const { register, handleSubmit, watch } = useForm<ISpeechSynthesisConf>();
     const onSubmit: SubmitHandler<ISpeechSynthesisConf> = data => {
@@ -78,11 +79,22 @@ function OpenModalChatboxComponent() {
         }, 1000)
     }
 
-    // useEffect(() => {
-    //     if (voices && voices.length > 0) {
-    //       setSelectedVoice(voices[5])
-    //     }
-    // }, [voices, setSelectedVoice]);
+     useEffect(() => {
+        if (localStorage.getItem("speechSynthesis") === null) {
+             const speechSynthesis: ISpeechSynthesisConf = {
+                rate: 1,
+                pitch: 1,
+                volume: 1
+            }
+            localStorage.setItem('speechSynthesis', JSON.stringify(speechSynthesis))
+            setCurrentSpeechSynthesis(speechSynthesis);
+        } else {
+            const speechSynthesis: ISpeechSynthesisConf = JSON.parse(localStorage.getItem("speechSynthesis") as string);
+            setCurrentSpeechSynthesis(speechSynthesis);
+        }
+    }, []);
+
+    
 
     // TODO
     // initial default values if you dont have any values in localhost
@@ -94,6 +106,10 @@ function OpenModalChatboxComponent() {
         }
 
         speak(speakArgs);
+    }
+
+    const onShowHandler = () => {
+        console.log('onShowHandler', currentSpeechSynthesis)
     }
 
     return (
@@ -121,7 +137,7 @@ function OpenModalChatboxComponent() {
                 </div>
             </div>
 
-            <Modal show={show} onHide={handleClose}>
+            <Modal show={show} onHide={handleClose} onShow={() => onShowHandler()}>
                 <form onSubmit={handleSubmit(onSubmit)}>
                 <Modal.Header closeButton>
                 <Modal.Title>Configuration</Modal.Title>
@@ -131,7 +147,7 @@ function OpenModalChatboxComponent() {
                         <label htmlFor="voice" className="form-label">Choose voice</label>
                         <Form.Select aria-label="Default select example" {...register("voice")}>
                             {window.speechSynthesis.getVoices().map((el, index) => 
-                                <option value={index} key={index}>{el.name}</option>
+                                <option value={el.name} key={index}>{el.name}</option>
                             )}
                         </Form.Select>
                     </div>
