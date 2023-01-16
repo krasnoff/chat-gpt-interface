@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import styles from './open-modal-chat.module.scss';
 import Spinner from 'react-bootstrap/Spinner';
 import useSpeechSynthesis  from './hooks/useSpeechSynthesis';
@@ -9,7 +9,7 @@ import { Button, Form, Modal } from 'react-bootstrap';
 import { SubmitHandler, useForm } from 'react-hook-form';
 
 interface ISpeechSynthesisConf {
-    voice?: SpeechSynthesisVoice;
+    voice?: string;
     rate: number;
     pitch: number;
     volume: number;
@@ -17,22 +17,23 @@ interface ISpeechSynthesisConf {
 
 function OpenModalChatboxComponent() {
     const [show, setShow] = useState(false);
-    const [value, setValue] = useState('');
+    const [resultValue, setResultValue] = useState('');
     const [isListening, setIsListening] = useState<boolean>(false);
     const [currentSpeechSynthesis, setCurrentSpeechSynthesis] = useState<ISpeechSynthesisConf>()
 
-    const { register, handleSubmit, watch } = useForm<ISpeechSynthesisConf>();
+    const { register, handleSubmit, watch, setValue } = useForm<ISpeechSynthesisConf>();
     const onSubmit: SubmitHandler<ISpeechSynthesisConf> = data => {
-        console.log(data);
+        localStorage.setItem('speechSynthesis', JSON.stringify(data));
+        setCurrentSpeechSynthesis(data);
         handleClose();
     };
     
     const { listen, listening, stop } = useSpeechRecognition({
         onResult: (result: any) => {
-            setValue(result);
+            setResultValue(result);
         },
         onEnd: async () => {
-            const res = await fetchData(value);
+            const res = await fetchData(resultValue);
             const res2 = parseAnswer(res);
             speakHandler(res2);
             setIsListening(false);
@@ -101,15 +102,35 @@ function OpenModalChatboxComponent() {
     // apply these setting to speech synthesis
 
     const speakHandler = (str: string) => {
+        const voicesList = window.speechSynthesis.getVoices()
+        let selectedVoice;
+
+        if (currentSpeechSynthesis?.voice) {
+            selectedVoice = voicesList.find(el => el.name === currentSpeechSynthesis?.voice);
+        }
+        
         const speakArgs: SpeakArguments = {
-            text: str
+            text: str,
+            rate: currentSpeechSynthesis?.rate,
+            pitch: currentSpeechSynthesis?.pitch,
+            volume: currentSpeechSynthesis?.volume,
+            voice: selectedVoice
         }
 
         speak(speakArgs);
     }
 
     const onShowHandler = () => {
-        console.log('onShowHandler', currentSpeechSynthesis)
+        if (currentSpeechSynthesis) {
+            setValue('rate', currentSpeechSynthesis?.rate);
+            setValue('pitch', currentSpeechSynthesis?.pitch);
+            setValue('volume', currentSpeechSynthesis?.volume);
+
+            if (currentSpeechSynthesis?.voice) {
+                setValue('voice', currentSpeechSynthesis?.voice);
+            }
+        }
+        
     }
 
     return (
