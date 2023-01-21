@@ -46,7 +46,10 @@ function OpenModalChatboxComponent() {
             // const REACT_APP_SERVER_BASE_URL = 
             const res = await fetch(`https://tame-blue-indri-veil.cyclic.app/`, {
                 method: 'POST',
-                body: JSON.stringify(searchString)
+                body: JSON.stringify(searchString),
+                headers: {
+                    // 'Content-Type': 'application/json'
+                },
             });
             const json = await res.json();
             return json;

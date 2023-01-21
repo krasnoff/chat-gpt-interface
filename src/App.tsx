@@ -2,7 +2,16 @@ import './App.scss';
 import OpenModalChatboxComponent from './components/open-modal-chat/open-modal-chat';
 import './components/open-modal-chat/open-modal-chat.tsx'
 
+import ReactGA from 'react-ga';
+// import { useEffect } from 'react';
+const TRACKING_ID = "G-SR1FRQMCDG"; // OUR_TRACKING_ID
+ReactGA.initialize(TRACKING_ID);
+
 function App() {
+  // useEffect(() => {
+  //   document.querySelector("meta[name='description']")?.setAttribute("content", '');
+  // }, []);
+  
   return (
     <div className="main">
       <OpenModalChatboxComponent></OpenModalChatboxComponent>
