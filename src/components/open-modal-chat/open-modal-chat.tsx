@@ -199,3 +199,9 @@ function OpenModalChatboxComponent() {
 }
 
 export default OpenModalChatboxComponent;
+
+// TODO
+// 1. verify browser - mobile or desktop
+// 2. desktop mode: set dedicated functions to mousedown and mouse up. neutrolize click event
+// 3. neutrolize mousedown and mouse up - click event set dedicated function
+// 4. instead of Go ahead I'm listening - display Press button again when you are done

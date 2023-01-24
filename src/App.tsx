@@ -15,7 +15,7 @@ function App() {
   return (
     <div className="main">
       <OpenModalChatboxComponent></OpenModalChatboxComponent>
-      <div className="mainContent mt-3">
+      <div className="mainContent mt-3 px-4">
         <p>In today's world, technology has advanced to the point where we can interact with our devices in a more natural way. One of the most exciting advancements in this field is the ability to use voice commands to control our devices. A React component that allows a user to talk to the computer and the computer replies with a human voice is a perfect example of this technology in action.</p>
         <p>The AI behind this component is based on ChatGPT, a large language model trained by OpenAI. ChatGPT is capable of understanding and responding to a wide variety of natural language inputs, making it the perfect choice for this type of application.</p>
         <p>The voice recognition and voice synthesis used in this component are based on the SpeechSynthesis and SpeechRecognition controller interfaces, which are available on the latest version of Chrome and Firefox browsers. These interfaces allow the component to understand spoken commands and respond with a synthetic voice.</p>
