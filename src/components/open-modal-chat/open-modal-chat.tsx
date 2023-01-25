@@ -182,7 +182,7 @@ function OpenModalChatboxComponent() {
                         : null}
                     </Button>
                     {listening && !isMobile && <div>Go ahead I'm listening</div>}
-                    {listening && isMobile && <div>Press button again when you are done talking</div>}
+                    {listening && isMobile && <div>Press button again when you are done</div>}
                     <div 
                         className={styles.configuration} 
                         title="Configuration" 
