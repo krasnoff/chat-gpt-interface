@@ -19,7 +19,8 @@ function OpenModalChatboxComponent() {
     const [show, setShow] = useState(false);
     const [resultValue, setResultValue] = useState('');
     const [isListening, setIsListening] = useState<boolean>(false);
-    const [currentSpeechSynthesis, setCurrentSpeechSynthesis] = useState<ISpeechSynthesisConf>()
+    const [currentSpeechSynthesis, setCurrentSpeechSynthesis] = useState<ISpeechSynthesisConf>();
+    const [isMobile, setIsMobile] = useState<boolean>(false);
 
     const { register, handleSubmit, watch, setValue } = useForm<ISpeechSynthesisConf>();
     const onSubmit: SubmitHandler<ISpeechSynthesisConf> = data => {
@@ -96,13 +97,19 @@ function OpenModalChatboxComponent() {
             const speechSynthesis: ISpeechSynthesisConf = JSON.parse(localStorage.getItem("speechSynthesis") as string);
             setCurrentSpeechSynthesis(speechSynthesis);
         }
+
+        getBowserVersion();
     }, []);
 
-    
-
-    // TODO
-    // initial default values if you dont have any values in localhost
-    // apply these setting to speech synthesis
+    const getBowserVersion = () => {
+        const userAgent = navigator.userAgent;
+        console.log('userAgent', userAgent);
+        if (userAgent.indexOf('Android') >= 0 || userAgent.indexOf('Mobile') >= 0 || userAgent.indexOf('iPhone') >= 0) {
+            setIsMobile(true);
+        } else {
+            setIsMobile(false);
+        }
+    }
 
     const speakHandler = (str: string) => {
         const voicesList = window.speechSynthesis.getVoices()
@@ -136,11 +143,34 @@ function OpenModalChatboxComponent() {
         
     }
 
+    const mouseUpHandler = () => {
+        if (!isMobile) {
+            initiateStop();
+        }
+    }
+
+    const mouseDownHandler = () => {
+        if (!isMobile) {
+            listen();
+        }
+    }
+
+    const clickHandler = () => {
+        if (isMobile) {
+            if (!listening) {
+                listen();
+            } else {
+                initiateStop();
+            }
+        }
+    }
+
     return (
         <>
             <div className={styles.buttonSection}>
                 <div className={styles.innerDiv}>
-                    <Button variant="danger"  onMouseDown={listen} onMouseUp={initiateStop} className={['btn btn-danger', 'btn-circle btn-xl'].join(' ')} disabled={isListening}>
+                    
+                    <Button variant="danger"  onMouseDown={mouseDownHandler} onMouseUp={mouseUpHandler} onClick={clickHandler} className={['btn btn-danger', 'btn-circle btn-xl'].join(' ')} disabled={isListening}>
                         {!isListening ? <i className={['bi bi-mic-fill', styles.iconLarge].join(' ')}></i> : null}
                         {isListening ? 
                             <Spinner
@@ -151,7 +181,8 @@ function OpenModalChatboxComponent() {
                             />
                         : null}
                     </Button>
-                    {listening && <div>Go ahead I'm listening</div>}
+                    {listening && !isMobile && <div>Go ahead I'm listening</div>}
+                    {listening && isMobile && <div>Press button again when you are done talking</div>}
                     <div 
                         className={styles.configuration} 
                         title="Configuration" 
@@ -204,4 +235,4 @@ export default OpenModalChatboxComponent;
 // 1. verify browser - mobile or desktop
 // 2. desktop mode: set dedicated functions to mousedown and mouse up. neutrolize click event
 // 3. neutrolize mousedown and mouse up - click event set dedicated function
-// 4. instead of Go ahead I'm listening - display Press button again when you are done
+// 4. instead of Go ahead I'm listening - display Press button again when you are done talking
